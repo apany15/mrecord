@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONFIGFILE="./mrecord.cfg"
+CONFIGFILE="mrecord.cfg"
 TRUE=1
 FALSE=0
 SUCCESS=0
@@ -93,9 +93,18 @@ function fn_record_stream() {
     done
 }
 
+
+curr_path=$(dirname "$(readlink -f "$0")")
+CONFIGFILE="${curr_path}/${CONFIGFILE}"
+
 [[ -n $1 ]] && CONFIGFILE=$1
 
+
 . "$CONFIGFILE"
+
+[[ -z $RECDIR ]] && { echo "ERROR: RECDIR is not set" >&2; exit 1; }
+[[ ! -d $RECDIR ]] && mkdir -p "${RECDIR}"
+[[ $? -ne $SUCCESS ]] && { echo "ERROR: failed to create [${RECDIR}]" >&2; exit 1; }
 
 fn_dump_config
 
