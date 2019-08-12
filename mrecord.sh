@@ -44,20 +44,16 @@ function fn_listen_stream_output() {
 }
 
 function remove_old_files() {
-    local max_comps=$1
-    local rec_dir=$2
-    find "$rec_dir" -name '*.mp3' ! -name "tempREC_*.mp3" -type f -printf '%Ts\t%p\n' \
+    find "$RECDIR" -name '*.mp3' ! -name "tempREC_*.mp3" -type f -printf '%Ts\t%p\n' \
         | sort -nr \
         | cut -f2 \
-        | tail -n +$(( max_comps + 1 )) \
+        | tail -n +$(( MAXCOMPS + 1 )) \
         | ( while read f; do echo "Removing old file [$f]"; rm -f "$f"; done )
 }
 
 function fn_record_stream() {
     local stream_URL=$1
     local stream_num=$2
-    local max_comps=$3
-    local rec_dir=$4
     local time_start=0
     local time_end=0
     local comp_len=0
@@ -93,7 +89,7 @@ function fn_record_stream() {
             rm -f "$RECDIR/$tempFileName"
         fi
         is_first_comp=${FALSE}
-        remove_old_files "$max_comps" "$rec_dir"
+        remove_old_files
     done
 }
 
@@ -109,7 +105,7 @@ trap ctrl_c INT
 while read -r streamURL
 do
     [[ -z ${streamURL} ]] && continue
-    fn_record_stream "$streamURL" ${counter} "$MAXCOMPS" "$RECDIR" &
+    fn_record_stream "$streamURL" ${counter} &
     counter=$(( counter + 1 ))
 done <<< "$(sed "s|[[:space:]]*#.*||" "$STREAMSFILE")"
 
