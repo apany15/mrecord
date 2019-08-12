@@ -103,8 +103,7 @@ CONFIGFILE="${curr_path}/${CONFIGFILE}"
 . "$CONFIGFILE"
 
 [[ -z $RECDIR ]] && { echo "ERROR: RECDIR is not set" >&2; exit 1; }
-[[ ! -d $RECDIR ]] && mkdir -p "${RECDIR}"
-[[ $? -ne $SUCCESS ]] && { echo "ERROR: failed to create [${RECDIR}]" >&2; exit 1; }
+[[ ! -d $RECDIR ]] && ( mkdir -p "${RECDIR}" || { echo "ERROR: failed to create [${RECDIR}]" >&2; exit 1; } )
 
 fn_dump_config
 
